@@ -1,4 +1,4 @@
-bun := /root/.bun/bin/bun
+bun := ~/.bun/bin/bun 
 APP_NAME=cerodev
 BUILD_DIR=dist
 
