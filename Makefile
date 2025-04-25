@@ -47,7 +47,7 @@ build-be:
 	GOARCH=arm64 CGO_ENABLED=0  go build -o cerodev
 
 
-build-final: ui-deps  build-ui 
+build-final:  build-ui 
 	GOOS=darwin GOARCH=arm64 CGO_ENABLED=0  go build -o $(BUILD_DIR)/$(APP_NAME)-darwin-arm64
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -o $(BUILD_DIR)/$(APP_NAME)-linux-amd64
 
@@ -57,6 +57,7 @@ run: build
 ui-deps:
 	apt update && apt install -y unzip 
 	curl -fsSL https://bun.sh/install | bash
+	export PATH=$PATH:$HOME/.bun/bin
 
 
 lint-deps:
