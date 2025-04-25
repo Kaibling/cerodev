@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { type ReactElement } from "react";
 import { apiRequest } from "@/api";
 import { User } from "../App";
+import { get_base_api_url } from "@/config";
+
 interface Container {
     id: string;
     docker_id: string;
@@ -102,6 +104,8 @@ export default function Containers({ user }: ContainerProps): ReactElement {
     };
 
     const handleDelete = async (container_id: string) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this container?");
+        if (!confirmDelete) return;
         apiRequest(`/api/v1/containers/${container_id}`, { method: "DELETE" }).then((data) => {
             getContainers();
         }).catch((err) => {
@@ -282,7 +286,7 @@ export default function Containers({ user }: ContainerProps): ReactElement {
                                 </button>
                                 {c.state === "running" && (
                                     <a
-                                        href={`http://localhost:${c.ui_port}`} // or any dynamic value
+                                        href={`${get_base_api_url()}:${c.ui_port}`} // or any dynamic value
                                         target="_blank"
                                         rel="noopener noreferrer"
                                     >

@@ -54,10 +54,13 @@ build-final:  build-ui
 run: build
 	./cerodev
 
+run-be: build-be
+	./cerodev
+
 ui-deps:
 	apt update && apt install -y unzip 
 	curl -fsSL https://bun.sh/install | bash
-	export PATH=$PATH:$HOME/.bun/bin
+	export PATH=${PATH}:${HOME}/.bun/bin
 
 
 lint-deps:

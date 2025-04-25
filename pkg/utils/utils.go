@@ -19,7 +19,9 @@ func GenerateULID() string {
 }
 
 func ContainerName(userID, gitRepo string) string {
-	return "cd-" + userID + "-" + strings.Split(gitRepo, "/")[len(strings.Split(gitRepo, "/"))-1]
+	parts := strings.Split(strings.TrimPrefix(gitRepo, "https://"), "/")
+	repoName := strings.Join(parts[len(parts)-2:], "_")
+	return "cd-" + userID + "-" + repoName
 }
 
 func PrintPrettyJSON(a any) {

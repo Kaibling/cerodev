@@ -74,6 +74,8 @@ export default function Templates(): ReactElement {
     };
 
     const handleDelete = async (id: string) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this template?");
+        if (!confirmDelete) return;
         apiRequest(`/api/v1/templates/${id}`, {
             method: "DELETE",
         }).then(() => {
@@ -84,13 +86,13 @@ export default function Templates(): ReactElement {
         });
     };
 
-    const handleBuild = async (id: string) => {
+    const handleBuild = async (id: string, repo_name: string) => {
         const input = buildInputs[id];
-        if (!input?.repo_name || !input?.tag) return;
+        if (!input?.tag) return;
 
         apiRequest(`/api/v1/templates/${id}`, {
             method: "POST",
-            body: input,
+            body: { ...input, repo_name: repo_name },
         }).then((data) => {
             setActiveBuildForm(null);
             setBuildInputs((prev) => {
@@ -207,7 +209,7 @@ export default function Templates(): ReactElement {
                                         className="overflow-hidden pl-1 pr-1"
                                     >
                                         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                            <input
+                                            {/* <input
                                                 className="p-2 rounded bg-gray-700 text-white"
                                                 placeholder="Image Name"
                                                 value={buildInputs[tpl.id]?.repo_name || ""}
@@ -217,7 +219,7 @@ export default function Templates(): ReactElement {
                                                         [tpl.id]: { ...prev[tpl.id], repo_name: e.target.value },
                                                     }))
                                                 }
-                                            />
+                                            /> */}
                                             <input
                                                 className="p-2 rounded bg-gray-700 text-white"
                                                 placeholder="Tag"
@@ -231,7 +233,7 @@ export default function Templates(): ReactElement {
                                             />
                                         </div>
                                         <button
-                                            onClick={() => handleBuild(tpl.id)}
+                                            onClick={() => handleBuild(tpl.id, tpl.repo_name)}
                                             className="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl"
                                         >
                                             🚀 Build Image

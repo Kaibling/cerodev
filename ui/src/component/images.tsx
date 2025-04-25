@@ -46,10 +46,10 @@ export default function Images(): ReactElement {
                             className="flex justify-between items-start bg-gray-800 rounded-xl p-4 border border-gray-700"
                         >
                             <div>
-                                <h3 className="text-lg font-semibold text-white">{i.repo_name}</h3>
+                                <h3 className="text-lg font-semibold text-white">{i.repo_name.split('-').pop()}</h3>
                                 <div className="text-sm space-y-1 mt-1">
-                                    <div className="text-gray-400">{i.tag}</div>
-                                    <div className="text-gray-400">{i.image_id}</div>
+                                    <div className="text-gray-400">tag: {i.tag}</div>
+                                    <div className="text-gray-400">id: {i.image_id}</div>
                                 </div>
                             </div>
                         </div>

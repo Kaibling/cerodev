@@ -254,7 +254,7 @@ func getImages(ctx context.Context, cli *client.Client) ([]model.Image, error) {
 		return nil, err
 	}
 
-	var imageList []model.Image
+	imageList := []model.Image{}
 
 	for _, image := range images {
 		for _, repoTag := range image.RepoTags {

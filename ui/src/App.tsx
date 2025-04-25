@@ -67,7 +67,7 @@ export function App() {
           <Route path="/" element={<PrivateRoute><Containers user={user} /></PrivateRoute>} />
           <Route path="/login" element={<LoginPage setUser={setUser} />} />
         </Routes>
-        <div className="text-sm text-gray-600 text-center p-4">
+        <div className="text-sm text-gray-600 text-center p-4 fixed bottom-0 left-1/2 transform -translate-x-1/2">
           version: {UI_VERSION}
         </div>
       </div>

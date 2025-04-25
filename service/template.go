@@ -1,6 +1,8 @@
 package service
 
 import (
+	"strings"
+
 	"github.com/kaibling/cerodev/model"
 	"github.com/kaibling/cerodev/pkg/utils"
 )
@@ -34,6 +36,7 @@ func (s *TemplateService) GetAll() ([]*model.Template, error) {
 func (s *TemplateService) Create(template *model.Template) (*model.Template, error) {
 	template.ID = utils.GenerateULID()
 	template.Dockerfile = baseTemplate
+	template.RepoName = strings.ToLower(template.RepoName)
 
 	return s.dbrepo.Create(template)
 }
@@ -92,7 +95,7 @@ WORKDIR /home/coder/workspace
 # Expose Code Server port
 
 RUN echo 'export PATH="$PATH:/go/bin:/usr/local/go/bin"' >> ~/.bashrc
-ENTRYPOINT ["/usr/bin/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "/usr/bin/entrypoint.sh"]
 # Start code-server as default CMD
 
 `
