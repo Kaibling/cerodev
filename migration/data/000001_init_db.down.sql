@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS ports;
+
+DROP TABLE IF EXISTS containers;
+
+DROP TABLE IF EXISTS templates;
+
+DROP TABLE IF EXISTS tokens;
+
+DROP TABLE IF EXISTS users;

@@ -1,0 +1,11 @@
+services:
+  cerodev-dev-container:
+    build: .
+    ports:
+      - "8088:8088"  # Expose application port
+      # - "2212:22"      # Expose SSH port
+      #- 3461:3000
+    volumes:
+      - ..:/workspace  # Mount the current directory as a volume
+      - /var/run/docker.sock:/var/run/docker.sock
+    container_name: cerodev-dev-container

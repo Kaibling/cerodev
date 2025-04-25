@@ -1,0 +1,27 @@
+{
+  "name": "Go Development Environment",
+  "dockerComposeFile": "docker-compose.yaml",
+  "service": "cerodev-dev-container",
+  "workspaceFolder": "/workspace",
+  "extensions": [
+    "golang.go",
+    "ms-vscode.vscode-typescript-next",
+    "codezombiech.gitignore",
+    "ms-vscode.cpptools",
+    "qwtel.sqlite-viewer",
+    "yy0931.vscode-sqlite3-editor"
+  ],
+  // "settings": {
+  //   "go.gopath": "/workspace/go",
+  //   "go.goroot": "/usr/local/go",
+  //   "go.inferGopath": true
+  // },
+  // "mounts": [
+  //   "source=${localWorkspaceFolder}/go,target=/workspace/go,type=bind"
+  // ],
+  "postCreateCommand": "go version"
+  // "forwardPorts": [
+  //   8180,
+  //   22
+  // ]
+}

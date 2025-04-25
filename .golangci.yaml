@@ -1,0 +1,48 @@
+version: "2"
+linters:
+  default: all
+  disable:
+    - containedctx
+    - depguard
+    - exhaustruct
+    - godox
+  #   - mnd
+    - varnamelen
+    - wrapcheck
+  settings:
+    tagliatelle:
+      case:
+        rules:
+          avro: snake
+          bson: camel
+          env: upperSnake
+          envconfig: upperSnake
+          json: snake
+          mapstructure: kebab
+          toml: camel
+          xml: camel
+          yaml: camel
+        use-field-name: true
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

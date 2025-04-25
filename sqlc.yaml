@@ -1,0 +1,9 @@
+version: "2"
+sql:
+  - engine: "sqlite"
+    queries: "pkg/repo/queries"
+    schema: "pkg/repo/schema.sql"
+    gen:
+      go:
+        package: "sqlcrepo"
+        out: "pkg/repo/sqlcrepo"
