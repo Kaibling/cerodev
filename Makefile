@@ -1,4 +1,3 @@
-bun := ~/.bun/bin/bun 
 APP_NAME=cerodev
 BUILD_DIR=dist
 
@@ -67,7 +66,7 @@ lint-deps:
 	go install github.com/daixiang0/gci@latest
 
 run-ui: ui-deps
-	cd ui/ && $(bun) run dev
+	cd ui/ && bun run dev
 
 
 lint:
@@ -79,7 +78,7 @@ lint:
 build-ui:
 	@base=$$(pwd); \
 	rm -fr ./web/static; \
-	cd ui/ && 	$(bun) install && $(bun) run build; \
+	cd ui/ && bun install && bun run build; \
 	cd $$base && cp -r ./ui/dist ./web/static
 
 deps:
