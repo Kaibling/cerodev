@@ -32,6 +32,6 @@ go.work.sum
 web/static
 ui/dist
 ui/node_modules
-
+dist
 
 .DS_Store

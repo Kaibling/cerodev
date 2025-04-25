@@ -1,12 +1,17 @@
 bun := /root/.bun/bin/bun
+APP_NAME=cerodev
+BUILD_DIR=dist
 
 
 build: ui-deps  build-ui build-be
 
 build-be:
-	#GOOS=darwin GOARCH=arm64 CGO_ENABLED=0  go build -o cerodev
 	GOARCH=arm64 CGO_ENABLED=0  go build -o cerodev
 
+
+build-final: ui-deps  build-ui 
+	GOOS=darwin GOARCH=arm64 CGO_ENABLED=0  go build -o $(BUILD_DIR)/$(APP_NAME)-darwin-arm64
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -o $(BUILD_DIR)/$(APP_NAME)-linux-amd64
 
 run: build
 	./cerodev
