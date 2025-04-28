@@ -286,7 +286,7 @@ export default function Containers({ user }: ContainerProps): ReactElement {
                                 </button>
                                 {c.state === "running" && (
                                     <a
-                                        href={`${get_base_api_url()}:${c.ui_port}`} // or any dynamic value
+                                        href={`${get_base_api_url()}/proxy/${c.id}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                     >

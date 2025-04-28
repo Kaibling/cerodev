@@ -21,6 +21,7 @@ func GenerateULID() string {
 func ContainerName(userID, gitRepo string) string {
 	parts := strings.Split(strings.TrimPrefix(gitRepo, "https://"), "/")
 	repoName := strings.Join(parts[len(parts)-2:], "_")
+
 	return "cd-" + userID + "-" + repoName
 }
 

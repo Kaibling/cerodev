@@ -8,19 +8,13 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/sqlite"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
-	"github.com/kaibling/cerodev/config"
 	_ "modernc.org/sqlite" // Import the SQLite driver
 )
 
 //go:embed data/*.sql
 var migrations embed.FS
 
-func Migrate(db *sql.DB, cfg config.Configuration) error {
-	// db, err := sql.Open("sqlite", cfg.DBConfig.FilePath)
-	// if err != nil {
-	// 	return err
-	// }
-
+func Migrate(db *sql.DB) error {
 	driver, err := sqlite.WithInstance(db, &sqlite.Config{})
 	if err != nil {
 		return err

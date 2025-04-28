@@ -21,7 +21,7 @@ import (
 
 const volumePermissions = 0o755
 
-func New() error {
+func New() error { //nolint:funlen
 	cfg := config.Load()
 	baselogger := apiservice.BuildLogger(apiservice.LogConfig{ //nolint:exhaustruct
 		LogLevel:     "debug",
@@ -44,7 +44,7 @@ func New() error {
 	ctx = context.WithValue(ctx, ctxkeys.DBConnKey, conn)
 	ctx = context.WithValue(ctx, ctxkeys.AppConfigKey, cfg)
 
-	if err := migration.Migrate(conn, cfg); err != nil {
+	if err := migration.Migrate(conn); err != nil {
 		appLogger.Warn("failed to migrate database: %s", err.Error())
 		ctxCancel()
 

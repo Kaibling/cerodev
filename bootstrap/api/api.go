@@ -46,6 +46,7 @@ func Start(
 	root.Use(middleware.LogRequest)
 	root.Use(middleware.Recoverer)
 
+	root.Mount("/proxy", proxyHandler())
 	root.Mount("/api/v1", api.Route())
 	web.AddUIRoute(root)
 

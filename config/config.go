@@ -30,6 +30,7 @@ type Configuration struct {
 	ContainerMaxPort int
 	DBConfig         DBConfiguration
 	VolumesPath      string
+	PublicURL        string
 }
 type DBConfiguration struct {
 	FilePath string
@@ -38,8 +39,9 @@ type DBConfiguration struct {
 func Load() Configuration {
 	// Load .env file
 	if err := godotenv.Load(); err != nil {
-		fmt.Println("Error loading .env file")
+		fmt.Println("Error loading .env file") //nolint: forbidigo
 	}
+
 	minPort, maxPort := splitPortRange(getEnv("CONTAINER_PORT_RANGE", defaultContainerPortRange))
 	if minPort == 0 || maxPort == 0 {
 		minPort, maxPort = splitPortRange(defaultContainerPortRange)
@@ -59,6 +61,7 @@ func Load() Configuration {
 		DBConfig: DBConfiguration{
 			FilePath: getEnv("DB_FILE_PATH", "cerodev.db"),
 		},
+		PublicURL: getEnv("PUBLIC_URL", "http://localhost"),
 	}
 }
 
