@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
-import Templates from "./component/templates";
-import Containers from "./component/containers";
-import Navbar from "./component/navbar";
-import Images from "./component/images";
-import { type ReactElement } from "react";
-import LoginPage from "./component/login";
-import { storage_token, UI_VERSION } from "./config";
-import { apiRequest } from "./api";
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Templates from './component/templates';
+import Containers from './component/containers';
+import Navbar from './component/navbar';
+import Images from './component/images';
+import { type ReactElement } from 'react';
+import LoginPage from './component/login';
+import { storage_token, UI_VERSION } from './config';
+import { apiRequest } from './api';
 
 export interface User {
   user_id: string;
@@ -16,7 +16,7 @@ export interface User {
 
 
 
-export function App() {
+export function App():ReactElement {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -26,7 +26,7 @@ export function App() {
       return;
     }
 
-    apiRequest(`/api/v1/auth/check`)
+    apiRequest('/api/v1/auth/check')
       .then((data) => {
         setUser({
           user_id: data.data.id,

@@ -1,5 +1,20 @@
 APP_NAME=cerodev
 BUILD_DIR=dist
+ARCH := $(shell uname -m)
+
+ifeq ($(ARCH),x86_64)
+	ARCH := amd64
+else ifeq ($(ARCH),aarch64)
+	ARCH := arm64
+else ifeq ($(ARCH),armv7l)
+	ARCH := arm
+else ifeq ($(ARCH),i686)
+	ARCH := 386
+else ifeq ($(ARCH),riscv64)
+	ARCH := riscv64
+else
+$(error Unsupported architecture: $(ARCH))
+endif
 
 CURRENT_TAG := $(shell git describe --tags --abbrev=0)
 BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
@@ -22,7 +37,6 @@ define increment_patch
 v$(MAJOR).$(MINOR).$(shell echo $$(($(PATCH) + 1)))
 endef
 
-
 major:
 	@git tag $(call increment_major)
 	@git push origin $(call increment_major)
@@ -40,12 +54,13 @@ current-tag:
 	@echo "Branch: $(BRANCH)"
 
 
-
-build: ui-deps  build-ui build-be
+build: deps-ui  build-ui build-be
 
 build-be:
-	GOARCH=arm64 CGO_ENABLED=0  go build -o cerodev
+	GOARCH=$(ARCH) CGO_ENABLED=0  go build -o cerodev
 
+run-be: build-be
+	./cerodev
 
 build-final:  build-ui 
 	GOOS=darwin GOARCH=arm64 CGO_ENABLED=0  go build -o $(BUILD_DIR)/$(APP_NAME)-darwin-arm64
@@ -54,30 +69,11 @@ build-final:  build-ui
 run: build
 	./cerodev
 
-run-be: build-be
-	./cerodev
 
-ui-deps:
+deps-ui:
 	apt update && apt install -y unzip 
 	curl -fsSL https://bun.sh/install | bash
 	export PATH=${PATH}:${HOME}/.bun/bin
-
-
-lint-deps:
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.1.2
-	go install golang.org/x/vuln/cmd/govulncheck@latest
-	go install mvdan.cc/gofumpt@latest
-	go install github.com/daixiang0/gci@latest
-
-run-ui: ui-deps
-	cd ui/ && bun run dev
-
-
-lint:
-	gofumpt -l -w .
-	govulncheck ./...
-	gci write --skip-generated -s standard -s default .
-	golangci-lint run
 
 build-ui:
 	@base=$$(pwd); \
@@ -85,15 +81,45 @@ build-ui:
 	cd ui/ && bun install && bun run build; \
 	cd $$base && cp -r ./ui/dist ./web/static
 
-deps:
+run-ui: deps-ui
+	cd ui/ && bun run dev
+
+# Lint
+
+.deps-lint:
+	@echo "Building Lint dependency..."
+	@touch .deps-lint
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.1.2
+	go install golang.org/x/vuln/cmd/govulncheck@latest
+	go install mvdan.cc/gofumpt@latest
+	go install github.com/daixiang0/gci@latest
+
+lint: .deps-lint
+	gofumpt -l -w .
+	govulncheck ./...
+	gci write --skip-generated -s standard -s default .
+	golangci-lint run
+
+lint-ui:
+	cd ui && bunx eslint src/ --format stylish
+
+# SQLC
+
+.deps-sql:
+	@touch .deps-sql
 	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
-	go install -tags 'sqlite' github.com/golang-migrate/migrate/v4/cmd/migrate
 	
-build-sql:
+build-sql: .deps-sql
 	sqlc generate
 
-migrate:
+# Migration
+
+.deps-migrate:
+	@touch .deps-migrate
+	go install -tags 'sqlite' github.com/golang-migrate/migrate/v4/cmd/migrate
+
+migrate: .deps-migrate
 	migrate -source file://migration/data -database "sqlite://cerodev.db" up
 
-rollback:
+rollback: .deps-migrate
 	migrate -source file://migration/data -database "sqlite://cerodev.db" down
