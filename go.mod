@@ -9,7 +9,7 @@ require (
 	github.com/go-chi/cors v1.2.1
 	github.com/golang-migrate/migrate/v4 v4.18.3
 	github.com/joho/godotenv v1.5.1
-	github.com/kaibling/apiforge v0.1.3
+	github.com/kaibling/apiforge v0.1.4
 	github.com/oklog/ulid/v2 v2.1.0
 	golang.org/x/crypto v0.37.0
 	modernc.org/sqlite v1.37.0

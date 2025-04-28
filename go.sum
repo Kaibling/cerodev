@@ -52,8 +52,8 @@ github.com/hashicorp/go-multierror v1.1.1 h1:H5DkEtf6CXdFp0N0Em5UCwQpXMWke8IA0+l
 github.com/hashicorp/go-multierror v1.1.1/go.mod h1:iw975J/qwKPdAO1clOe2L8331t/9/fmwbPZ6JB6eMoM=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
 github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
-github.com/kaibling/apiforge v0.1.3 h1:qFcPK9+UvrlG9La2h9Rj8JW2YyN+kV9zjKPDMezy4rA=
-github.com/kaibling/apiforge v0.1.3/go.mod h1:F8FTVzzrs0DXTqJxDXWs2aoPaUW/B4nN0dWf8yO6qC4=
+github.com/kaibling/apiforge v0.1.4 h1:8InPQtBwgPhVpYj97CowH+Yud6VXLlAIBhS+C4NHGuA=
+github.com/kaibling/apiforge v0.1.4/go.mod h1:F8FTVzzrs0DXTqJxDXWs2aoPaUW/B4nN0dWf8yO6qC4=
 github.com/kisielk/errcheck v1.5.0/go.mod h1:pFxgyoBC7bSaBwPgfKdkLd5X25qrDl4LWUI2bnpBCr8=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/lib/pq v1.10.9 h1:YXG7RB+JIjhP29X+OtkiDnYaXQwpS4JEWq7dtCCRUEw=
