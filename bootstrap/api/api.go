@@ -53,8 +53,11 @@ func Start(
 	// root.NotFound(handler.NotFound)
 
 	apiServer := apiservice.New(ctx, apiservice.ServerConfig{ //nolint:exhaustruct
-		BindingIP:   cfg.APIBindingIP,
-		BindingPort: cfg.APIBindingPort,
+		BindingIP:      cfg.APIBindingIP,
+		BindingPort:    cfg.APIBindingPort,
+		EnableTLS:      cfg.APIEnableTLS,
+		TLSCertPath:    cfg.APITLSCertPath,
+		TLSCertKeyPath: cfg.APITLSCertKeyPath,
 	})
 
 	status.IsReady.Store(true)

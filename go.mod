@@ -9,7 +9,7 @@ require (
 	github.com/go-chi/cors v1.2.1
 	github.com/golang-migrate/migrate/v4 v4.18.3
 	github.com/joho/godotenv v1.5.1
-	github.com/kaibling/apiforge v0.1.4
+	github.com/kaibling/apiforge v0.1.5
 	github.com/oklog/ulid/v2 v2.1.0
 	golang.org/x/crypto v0.37.0
 	modernc.org/sqlite v1.37.0
@@ -52,7 +52,7 @@ require (
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/time v0.11.0 // indirect
 	gotest.tools/v3 v3.5.2 // indirect
-	modernc.org/libc v1.63.1 // indirect
+	modernc.org/libc v1.65.0 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.10.0 // indirect
 )

@@ -59,12 +59,13 @@ RUN apt-get update && apt-get install -y git make
 
 # Set Go version — change as needed
 ENV GO_VERSION=1.24.2
+ENV ARCHITECTURE=arm64
 
 # Download and install Go
-RUN curl -LO https://golang.org/dl/go${GO_VERSION}.linux-arm64.tar.gz && \
+RUN curl -LO https://golang.org/dl/go${GO_VERSION}.linux-${ARCHITECTURE}.tar.gz && \
     rm -rf /usr/local/go && \
-    tar -C /usr/local -xzf go${GO_VERSION}.linux-arm64.tar.gz && \
-    rm go${GO_VERSION}.linux-arm64.tar.gz
+    tar -C /usr/local -xzf go${GO_VERSION}.linux-${ARCHITECTURE}.tar.gz && \
+    rm go${GO_VERSION}.linux-${ARCHITECTURE}.tar.gz
 
 # Set Go paths
 ENV PATH="/usr/local/go/bin:${PATH}"
@@ -97,5 +98,4 @@ WORKDIR /home/coder/workspace
 RUN echo 'export PATH="$PATH:/go/bin:/usr/local/go/bin"' >> ~/.bashrc
 ENTRYPOINT ["/bin/bash", "/usr/bin/entrypoint.sh"]
 # Start code-server as default CMD
-
 `

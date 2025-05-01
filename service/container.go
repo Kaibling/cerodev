@@ -1,12 +1,15 @@
 package service
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/kaibling/apiforge/log"
 	"github.com/kaibling/cerodev/config"
+	"github.com/kaibling/cerodev/errs"
 	"github.com/kaibling/cerodev/model"
 	"github.com/kaibling/cerodev/pkg/utils"
 )
@@ -66,6 +69,10 @@ func (s *ContainerService) GetByID(id string) (*model.Container, error) {
 	status, err := s.dockerrepo.GetContainerStatuses([]string{container.DockerID})
 	if err != nil {
 		return nil, err
+	}
+
+	if len(status) == 0 {
+		return container, errs.ErrContainerNotInProvider
 	}
 
 	container.Status = status[0].Status
@@ -159,17 +166,20 @@ func (s *ContainerService) StopContainer(containerID string) error {
 
 func (s *ContainerService) DeleteContainer(containerID string) error {
 	m, err := s.GetByID(containerID)
-	if err != nil {
-		return err
-	}
-
-	if err := s.dockerrepo.DeleteContainer(m.DockerID); err != nil {
-		if !strings.Contains(err.Error(), "No such container") {
-			// Container already deleted, no need to return an error
-			return err
+	if err != nil { //nolint:nestif
+		if errors.Is(err, errs.ErrContainerNotInProvider) {
+			s.l.Warn("container is not in provider. skip deletion in provider")
+		} else {
+			return fmt.Errorf("could not get container: %w", err)
+		}
+	} else {
+		if err := s.dockerrepo.DeleteContainer(m.DockerID); err != nil {
+			if !strings.Contains(err.Error(), "No such container") {
+				// Container already deleted, no need to return an error
+				return err
+			}
 		}
 	}
-
 	// delete volumes directory
 	volumeDir := s.cfg.VolumesPath + "/" + m.ID
 	if err := os.RemoveAll(volumeDir); err != nil {

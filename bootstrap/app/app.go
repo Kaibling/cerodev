@@ -31,6 +31,10 @@ func New() error { //nolint:funlen
 		AppName:      config.AppName,
 	})
 	appLogger := baselogger.Named("startup")
+	appLogger.Info("version: %s", config.Version)
+	appLogger.Info("build_time: %s", config.BuildTime)
+	appLogger.Info("architecture: %s", config.Architecture)
+
 	ctx, ctxCancel := context.WithCancel(context.Background())
 
 	conn, err := sqliterepo.Connect(cfg.DBConfig.FilePath)

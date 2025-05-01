@@ -35,3 +35,14 @@ ui/node_modules
 dist
 
 .DS_Store
+
+#makefiles
+.deps-ui
+.deps-migrate
+.deps-sql
+.deps-lint
+.deps-ui
+
+# certificates
+*.key
+*.crt

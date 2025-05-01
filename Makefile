@@ -1,6 +1,8 @@
 APP_NAME=cerodev
 BUILD_DIR=dist
 ARCH := $(shell uname -m)
+buildTime := $(shell date -u "+%Y-%m-%dT%H:%M:%S")
+version := $(shell git describe --tags)
 
 ifeq ($(ARCH),x86_64)
 	ARCH := amd64
@@ -54,23 +56,24 @@ current-tag:
 	@echo "Branch: $(BRANCH)"
 
 
-build: deps-ui  build-ui build-be
+build: .deps-ui  build-ui build-be
 
 build-be:
-	GOARCH=$(ARCH) CGO_ENABLED=0  go build -o cerodev
+	GOARCH=$(ARCH) CGO_ENABLED=0  go build -ldflags "-X main.version=${version} -X main.buildTime=${buildTime} -X main.architecture=${ARCH}" -o cerodev
 
 run-be: build-be
 	./cerodev
 
 build-final:  build-ui 
-	GOOS=darwin GOARCH=arm64 CGO_ENABLED=0  go build -o $(BUILD_DIR)/$(APP_NAME)-darwin-arm64
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -o $(BUILD_DIR)/$(APP_NAME)-linux-amd64
+	GOOS=darwin GOARCH=arm64 CGO_ENABLED=0  go build -ldflags "-X main.version=${version} -X main.buildTime=${buildTime} -X main.architecture=${ARCH}" -o $(BUILD_DIR)/$(APP_NAME)-darwin-arm64
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -ldflags "-X main.version=${version} -X main.buildTime=${buildTime} -X main.architecture=${ARCH}" -o $(BUILD_DIR)/$(APP_NAME)-linux-amd64
 
 run: build
 	./cerodev
 
 
-deps-ui:
+.deps-ui:
+	@touch .deps-ui
 	apt update && apt install -y unzip 
 	curl -fsSL https://bun.sh/install | bash
 	export PATH=${PATH}:${HOME}/.bun/bin
@@ -81,7 +84,7 @@ build-ui:
 	cd ui/ && bun install && bun run build; \
 	cd $$base && cp -r ./ui/dist ./web/static
 
-run-ui: deps-ui
+run-ui: .deps-ui
 	cd ui/ && bun run dev
 
 # Lint
@@ -123,3 +126,13 @@ migrate: .deps-migrate
 
 rollback: .deps-migrate
 	migrate -source file://migration/data -database "sqlite://cerodev.db" down
+
+# cert
+cert:
+	openssl req -x509 -newkey rsa:4096 -nodes \
+	-keyout server.key -out server.crt -days 365 \
+	-subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=localhost"
+
+update:
+	go get -u
+	go mod tidy

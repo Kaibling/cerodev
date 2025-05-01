@@ -5,4 +5,6 @@ const (
 	RequestParse     = "failed to parse request"
 	WrongCredentials = "user/password missmatch"
 	InvalidToken     = "token invalid"
+
+	ContainerNotInProvider = "container in provider not found"
 )

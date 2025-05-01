@@ -17,4 +17,6 @@ func ErrMsg(msg string, err error) string {
 var (
 	ErrWrongCredentials = errors.New(msg.WrongCredentials)
 	ErrInvalidToken     = errors.New(msg.InvalidToken)
+
+	ErrContainerNotInProvider = errors.New(msg.ContainerNotInProvider)
 )
