@@ -127,6 +127,7 @@ func buildImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	buildParams.Validate()
 	buildParams.TemplateID = templateID
 
 	ctrs, err := bootstrap.NewContainerService(r.Context())

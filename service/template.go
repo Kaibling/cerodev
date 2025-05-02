@@ -51,15 +51,16 @@ func (s *TemplateService) Update(template *model.Template) (*model.Template, err
 
 const baseTemplate = `
 FROM codercom/code-server:latest
+ARG ARCHITECTURE
+
 ENV DEBIAN_FRONTEND=noninteractive
+# Set Go version — change as needed
+ENV GO_VERSION=1.24.2
+ENV ARCHITECTURE=${ARCHITECTURE}
 
 # Install git, Go, etc. if needed
 USER root
 RUN apt-get update && apt-get install -y git make
-
-# Set Go version — change as needed
-ENV GO_VERSION=1.24.2
-ENV ARCHITECTURE=arm64
 
 # Download and install Go
 RUN curl -LO https://golang.org/dl/go${GO_VERSION}.linux-${ARCHITECTURE}.tar.gz && \

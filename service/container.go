@@ -205,6 +205,8 @@ func (s *ContainerService) BuildTemplate(templateID string, tag string, env map[
 		return err
 	}
 
+	env["ARCHITECTURE"] = &config.Architecture
+
 	return s.dockerrepo.Build(*t, tag, env)
 }
 

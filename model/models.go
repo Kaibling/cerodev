@@ -52,6 +52,12 @@ type BuildParams struct {
 	BuildArgs  map[string]*string `json:"build_args"` // ["ENV=prod"]
 }
 
+func (bp *BuildParams) Validate() {
+	if bp.BuildArgs == nil {
+		bp.BuildArgs = map[string]*string{}
+	}
+}
+
 type LoginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
