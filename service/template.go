@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/kaibling/cerodev/model"
@@ -26,27 +27,38 @@ func NewTemplateService(dbrepo templaterepo) *TemplateService {
 }
 
 func (s *TemplateService) GetByID(id string) (*model.Template, error) {
-	return s.dbrepo.GetByID(id)
+	val, err := s.dbrepo.GetByID(id)
+
+	return HandleError[*model.Template](val, err, "failed to GetByID")
 }
 
 func (s *TemplateService) GetAll() ([]*model.Template, error) {
-	return s.dbrepo.GetAll()
+	val, err := s.dbrepo.GetAll()
+
+	return HandleError[[]*model.Template](val, err, "failed to GetAll")
 }
 
 func (s *TemplateService) Create(template *model.Template) (*model.Template, error) {
 	template.ID = utils.GenerateULID()
 	template.Dockerfile = baseTemplate
 	template.RepoName = strings.ToLower(template.RepoName)
+	val, err := s.dbrepo.Create(template)
 
-	return s.dbrepo.Create(template)
+	return HandleError[*model.Template](val, err, "failed to Create")
 }
 
 func (s *TemplateService) Delete(id string) error {
-	return s.dbrepo.Delete(id)
+	if err := s.dbrepo.Delete(id); err != nil {
+		return fmt.Errorf("failed to db template Delete: %w", err)
+	}
+
+	return nil
 }
 
 func (s *TemplateService) Update(template *model.Template) (*model.Template, error) {
-	return s.dbrepo.Update(template)
+	val, err := s.dbrepo.Update(template)
+
+	return HandleError[*model.Template](val, err, "failed to Update")
 }
 
 const baseTemplate = `

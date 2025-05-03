@@ -63,12 +63,12 @@ func NewContainerService(dbrepo dbrepo,
 func (s *ContainerService) GetByID(id string) (*model.Container, error) {
 	container, err := s.dbrepo.GetByID(id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to  GetByID: %w", err)
+		return nil, fmt.Errorf("failed to GetByID: %w", err)
 	}
 
 	status, err := s.dockerrepo.GetContainerStatuses([]string{container.DockerID})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to provider GetContainerStatuses: %w", err)
 	}
 
 	if len(status) == 0 {
@@ -84,7 +84,7 @@ func (s *ContainerService) GetByID(id string) (*model.Container, error) {
 func (s *ContainerService) GetAll() ([]model.Container, error) {
 	containers, err := s.dbrepo.GetAll()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to GetAll: %w", err)
 	}
 
 	containerIDs := make([]string, len(containers))
@@ -94,7 +94,7 @@ func (s *ContainerService) GetAll() ([]model.Container, error) {
 
 	statuses, err := s.dockerrepo.GetContainerStatuses(containerIDs)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to GetContainerStatuses: %w", err)
 	}
 
 	for i, c := range containers {
@@ -116,12 +116,12 @@ func (s *ContainerService) Create(container *model.Container) (*model.Container,
 	if err != nil {
 		s.l.Error("Failed to get free port", err)
 
-		return nil, err
+		return nil, fmt.Errorf("failed to GetFreePort: %w", err)
 	}
 
 	// add vscode port to container
 	if err := s.dbrepo.AllocatePort(container.ID, freePort); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to AllocatePort: %w", err)
 	}
 
 	container.Ports = append(container.Ports, strconv.Itoa(freePort)+":8765/tcp")
@@ -134,12 +134,14 @@ func (s *ContainerService) Create(container *model.Container) (*model.Container,
 
 	ctrID, err := s.dockerrepo.CreateContainer(container)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to CreateContainer: %w", err)
 	}
 
 	container.DockerID = ctrID
 
-	return s.dbrepo.Create(container)
+	val, err := s.dbrepo.Create(container)
+
+	return HandleError[*model.Container](val, err, "failed to db Create")
 }
 
 func (s *ContainerService) Update(container *model.Container) (*model.Container, error) {
@@ -149,19 +151,27 @@ func (s *ContainerService) Update(container *model.Container) (*model.Container,
 func (s *ContainerService) StartContainer(containerID string) error {
 	m, err := s.GetByID(containerID)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to GetByID: %w", err)
 	}
 
-	return s.dockerrepo.StartContainer(m.DockerID)
+	if err := s.dockerrepo.StartContainer(m.DockerID); err != nil {
+		return fmt.Errorf("failed to provider StartContainer: %w", err)
+	}
+
+	return nil
 }
 
 func (s *ContainerService) StopContainer(containerID string) error {
 	m, err := s.GetByID(containerID)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to GetByID: %w", err)
 	}
 
-	return s.dockerrepo.StopContainer(m.DockerID)
+	if err := s.dockerrepo.StopContainer(m.DockerID); err != nil {
+		return fmt.Errorf("failed to provider StopContainer: %w", err)
+	}
+
+	return nil
 }
 
 func (s *ContainerService) DeleteContainer(containerID string) error {
@@ -175,49 +185,65 @@ func (s *ContainerService) DeleteContainer(containerID string) error {
 	} else {
 		if err := s.dockerrepo.DeleteContainer(m.DockerID); err != nil {
 			if !strings.Contains(err.Error(), "No such container") {
-				// Container already deleted, no need to return an error
-				return err
+				return fmt.Errorf("failed to DeleteContainer: %w", err)
 			}
 		}
 	}
+
 	// delete volumes directory
 	volumeDir := s.cfg.VolumesPath + "/" + m.ID
 	if err := os.RemoveAll(volumeDir); err != nil {
 		s.l.Warn("Failed to remove volumes directory: %s", err.Error())
 
-		return err
+		return fmt.Errorf("failed to delete volume: %w", err)
 	}
 
 	s.l.Debug("Removed volumes directory: %s", volumeDir)
 
 	if err := s.dbrepo.ReleasePort(containerID); err != nil {
-		return err
+		return fmt.Errorf("failed to ReleasePort: %w", err)
 	}
 
 	s.l.Debug("Released UI port: %s", m.UIPort)
 
-	return s.dbrepo.Delete(containerID)
+	if err := s.dbrepo.Delete(containerID); err != nil {
+		return fmt.Errorf("failed to db Delete: %w", err)
+	}
+
+	return nil
 }
 
 func (s *ContainerService) BuildTemplate(templateID string, tag string, env map[string]*string) error {
 	t, err := s.templaterepo.GetByID(templateID)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to GetByID: %w", err)
 	}
 
 	env["ARCHITECTURE"] = &config.Architecture
 
-	return s.dockerrepo.Build(*t, tag, env)
+	if err := s.dockerrepo.Build(*t, tag, env); err != nil {
+		return fmt.Errorf("failed to provider Build: %w", err)
+	}
+
+	return nil
 }
 
 func (s *ContainerService) GetImages() ([]model.Image, error) {
-	return s.dockerrepo.GetImages()
+	val, err := s.dockerrepo.GetImages()
+
+	return HandleError[[]model.Image](val, err, "failed to GetImages")
 }
 
 func (s *ContainerService) GetPortCount() (int, error) {
-	return s.dbrepo.GetPortCount()
+	val, err := s.dbrepo.GetPortCount()
+
+	return HandleError[int](val, err, "failed to GetPortCount")
 }
 
 func (s *ContainerService) FillPorts(minPort, maxPort int) error {
-	return s.dbrepo.FillPorts(minPort, maxPort)
+	if err := s.dbrepo.FillPorts(minPort, maxPort); err != nil {
+		return fmt.Errorf("failed to db FillPorts: %w", err)
+	}
+
+	return nil
 }

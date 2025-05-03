@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/kaibling/cerodev/config"
 	"github.com/kaibling/cerodev/errs"
 	"github.com/kaibling/cerodev/model"
@@ -32,19 +34,19 @@ func NewUserService(repo userrepo, tokenService *TokenService, cfg config.Config
 	}
 }
 
-func (s *UserService) GetByID(id string) (model.User, error) {
+func (s *UserService) GetByID(id string) (*model.User, error) {
 	user, err := s.userRepo.GetByID(id)
 	if err != nil {
-		return model.User{}, err
+		return nil, fmt.Errorf("failed to user GetByID: %w", err)
 	}
 
-	return *user, nil
+	return user, nil
 }
 
 func (s *UserService) GetAll() ([]model.User, error) {
 	users, err := s.userRepo.GetAll()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to user GetAll: %w", err)
 	}
 
 	result := make([]model.User, len(users))
@@ -60,28 +62,42 @@ func (s *UserService) Create(user *model.User) (*model.User, error) {
 
 	hashedPassword, err := crypto.HashPassword(user.Password, s.cfg.PasswordCost)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to user HashPassword: %w", err)
 	}
 
 	user.Password = hashedPassword
 
-	return s.userRepo.Create(user)
+	val, err := s.userRepo.Create(user)
+
+	return HandleError[*model.User](val, err, "failed to db Get")
 }
 
 func (s *UserService) Delete(id string) error {
-	return s.userRepo.Delete(id)
+	if err := s.userRepo.Delete(id); err != nil {
+		return fmt.Errorf("failed to db Delete: %w", err)
+	}
+
+	return nil
 }
 
 func (s *UserService) Update(user model.User) error {
-	return s.userRepo.Update(&user)
+	if err := s.userRepo.Update(&user); err != nil {
+		return fmt.Errorf("failed to db Delete: %w", err)
+	}
+
+	return nil
 }
 
 func (s *UserService) CheckToken(token string) (*model.User, error) {
-	return s.userRepo.GetUserByToken(token)
+	val, err := s.userRepo.GetUserByToken(token)
+
+	return HandleError[*model.User](val, err, "failed to db GGetUserByTokent")
 }
 
 func (s *UserService) GetUnsafeByUsername(username string) (*model.User, error) {
-	return s.userRepo.GetUnsafeByUsername(username)
+	val, err := s.userRepo.GetUnsafeByUsername(username)
+
+	return HandleError[*model.User](val, err, "failed to db GetUnsafeByUsername")
 }
 
 func (s *UserService) Login(loginRequest *model.LoginRequest) (*model.LoginResponse, error) {
@@ -103,7 +119,7 @@ func (s *UserService) Login(loginRequest *model.LoginRequest) (*model.LoginRespo
 	// create new token
 	newToken, err := s.tokenService.CreateForUser(user.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to CreateForUser: %w", err)
 	}
 
 	return &model.LoginResponse{

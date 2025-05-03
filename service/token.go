@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/kaibling/cerodev/config"
 	"github.com/kaibling/cerodev/model"
 	"github.com/kaibling/cerodev/pkg/crypto"
@@ -28,7 +30,7 @@ func NewTokenService(repo tokenrepo, cfg config.Configuration) *TokenService {
 func (s *TokenService) CreateForUser(userID string) (*model.Token, error) {
 	tokenKey, err := crypto.GenerateToken(s.cfg.TokenLength)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to GenerateToken: %w", err)
 	}
 
 	newToken := &model.Token{
@@ -36,26 +38,36 @@ func (s *TokenService) CreateForUser(userID string) (*model.Token, error) {
 		Token:  tokenKey,
 	}
 
-	return s.repo.Create(newToken)
+	val, err := s.repo.Create(newToken)
+
+	return HandleError[*model.Token](val, err, "failed to db Create")
 }
 
 func (s *TokenService) CreateUnsafe(token *model.Token) (*model.Token, error) {
-	return s.repo.Create(token)
+	val, err := s.repo.Create(token)
+
+	return HandleError[*model.Token](val, err, "failed to db Create")
 }
 
 func (s *TokenService) Delete(token string) error {
-	return s.repo.Delete(token)
+	if err := s.repo.Delete(token); err != nil {
+		return fmt.Errorf("failed to db Delete: %w", err)
+	}
+
+	return nil
 }
 
 func (s *TokenService) Validate(token string) (bool, error) {
 	t, err := s.GetByTokenKey(token)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("failed to GetByTokenKey: %w", err)
 	}
 
 	return t != nil, nil
 }
 
 func (s *TokenService) GetByTokenKey(token string) (*model.Token, error) {
-	return s.repo.Get(token)
+	val, err := s.repo.Get(token)
+
+	return HandleError[*model.Token](val, err, "failed to db Get")
 }
