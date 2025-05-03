@@ -63,7 +63,7 @@ func NewContainerService(dbrepo dbrepo,
 func (s *ContainerService) GetByID(id string) (*model.Container, error) {
 	container, err := s.dbrepo.GetByID(id)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to  GetByID: %w", err)
 	}
 
 	status, err := s.dockerrepo.GetContainerStatuses([]string{container.DockerID})

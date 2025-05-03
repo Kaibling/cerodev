@@ -7,4 +7,8 @@ const (
 	InvalidToken     = "token invalid"
 
 	ContainerNotInProvider = "container in provider not found"
+
+	APIDataNotFound  = "data not found"
+	APIDataTxError   = "transaction error"
+	APIInternalError = "server error"
 )

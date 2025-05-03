@@ -3,9 +3,9 @@ package template
 import (
 	"net/http"
 
-	"github.com/kaibling/apiforge/apierror"
 	"github.com/kaibling/apiforge/envelope"
 	"github.com/kaibling/apiforge/route"
+	"github.com/kaibling/cerodev/api/apierrs"
 	"github.com/kaibling/cerodev/bootstrap"
 	"github.com/kaibling/cerodev/errs"
 	"github.com/kaibling/cerodev/errs/msg"
@@ -24,7 +24,7 @@ func getTemplates(w http.ResponseWriter, r *http.Request) {
 	cs, err := bootstrap.NewTemplateService(r.Context())
 	if err != nil {
 		l.Warn(errs.ServiceBuildError(bootstrap.TemplateServiceName, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -32,7 +32,7 @@ func getTemplates(w http.ResponseWriter, r *http.Request) {
 	templates, err := cs.GetAll()
 	if err != nil {
 		l.Warn(errs.ErrMsg("cannot get all tokens", err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -52,7 +52,7 @@ func createTemplate(w http.ResponseWriter, r *http.Request) {
 	var requestTemplate model.Template
 	if err := route.ReadPostData(r, &requestTemplate); err != nil {
 		l.Warn(errs.ErrMsg(msg.RequestParse, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -62,7 +62,7 @@ func createTemplate(w http.ResponseWriter, r *http.Request) {
 	cs, err := bootstrap.NewTemplateService(r.Context())
 	if err != nil {
 		l.Warn(errs.ServiceBuildError(bootstrap.TemplateServiceName, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -70,7 +70,7 @@ func createTemplate(w http.ResponseWriter, r *http.Request) {
 	newTemplate, err := cs.Create(&requestTemplate)
 	if err != nil {
 		l.Warn(errs.ErrMsg("cannot create template", err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -92,7 +92,7 @@ func deleteTemplate(w http.ResponseWriter, r *http.Request) {
 	cs, err := bootstrap.NewTemplateService(r.Context())
 	if err != nil {
 		l.Warn(errs.ServiceBuildError(bootstrap.TemplateServiceName, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -100,7 +100,7 @@ func deleteTemplate(w http.ResponseWriter, r *http.Request) {
 	err = cs.Delete(templateID)
 	if err != nil {
 		l.Warn(errs.ErrMsg("cannot delete template", err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -122,7 +122,7 @@ func buildImage(w http.ResponseWriter, r *http.Request) {
 	var buildParams model.BuildParams
 	if err := route.ReadPostData(r, &buildParams); err != nil {
 		l.Warn(errs.ErrMsg(msg.RequestParse, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -133,7 +133,7 @@ func buildImage(w http.ResponseWriter, r *http.Request) {
 	ctrs, err := bootstrap.NewContainerService(r.Context())
 	if err != nil {
 		l.Warn(errs.ServiceBuildError(bootstrap.TemplateServiceName, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -141,7 +141,7 @@ func buildImage(w http.ResponseWriter, r *http.Request) {
 	err = ctrs.BuildTemplate(buildParams.TemplateID, buildParams.Tag, buildParams.BuildArgs)
 	if err != nil {
 		l.Warn(errs.ErrMsg("cannot build template", err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -163,7 +163,7 @@ func updateTemplate(w http.ResponseWriter, r *http.Request) {
 	var template model.Template
 	if err := route.ReadPostData(r, &template); err != nil {
 		l.Warn(errs.ErrMsg(msg.RequestParse, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -173,7 +173,7 @@ func updateTemplate(w http.ResponseWriter, r *http.Request) {
 	ts, err := bootstrap.NewTemplateService(r.Context())
 	if err != nil {
 		l.Warn(errs.ServiceBuildError(bootstrap.TemplateServiceName, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -181,7 +181,7 @@ func updateTemplate(w http.ResponseWriter, r *http.Request) {
 	newTemplate, err := ts.Update(&template)
 	if err != nil {
 		l.Warn(errs.ErrMsg("cannot update template", err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}

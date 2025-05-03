@@ -26,7 +26,7 @@ func NewContainerRepo(ctx context.Context, db *sql.DB, l log.Writer) *ContainerR
 func (r *ContainerRepo) GetByID(id string) (*model.Container, error) {
 	container, err := sqlcrepo.New(r.db).GetContainerByID(r.ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, ToAppError(fmt.Errorf("GetContainerByID failed: %w", err))
 	}
 
 	env := container.EnvVars.String
@@ -46,7 +46,7 @@ func (r *ContainerRepo) GetByID(id string) (*model.Container, error) {
 func (r *ContainerRepo) GetAll() ([]model.Container, error) {
 	containers, err := sqlcrepo.New(r.db).GetAllContainers(r.ctx)
 	if err != nil {
-		return nil, err
+		return nil, ToAppError(fmt.Errorf("GetAllContainers failed: %w", err))
 	}
 
 	result := []model.Container{}
@@ -79,7 +79,7 @@ func (r *ContainerRepo) Create(container *model.Container) (*model.Container, er
 		Ports:         sql.NullString{String: joinStrings(container.Ports), Valid: true},
 	})
 	if err != nil {
-		return nil, err
+		return nil, ToAppError(err)
 	}
 
 	return r.GetByID(containerID)
@@ -99,7 +99,7 @@ func (r *ContainerRepo) Update(container *model.Container) (*model.Container, er
 		Ports:         sql.NullString{String: joinStrings(container.Ports), Valid: true},
 	})
 	if err != nil {
-		return nil, err
+		return nil, ToAppError(err)
 	}
 
 	return r.GetByID(container.ID)
@@ -112,7 +112,7 @@ func (r *ContainerRepo) ReleasePort(containerID string) error {
 func (r *ContainerRepo) GetFreePort() (int, error) {
 	port, err := sqlcrepo.New(r.db).GetFreePort(r.ctx)
 	if err != nil {
-		return 0, err
+		return 0, ToAppError(err)
 	}
 
 	return int(port), nil
@@ -129,13 +129,13 @@ func (r *ContainerRepo) AllocatePort(containerID string, port int) error {
 func (r *ContainerRepo) GetPortCount() (int, error) {
 	count, err := sqlcrepo.New(r.db).GetPortCount(r.ctx)
 
-	return int(count), err
+	return int(count), ToAppError(err)
 }
 
 func (r *ContainerRepo) FillPorts(minPort, maxPort int) error {
 	tx, err := r.db.BeginTx(r.ctx, nil)
 	if err != nil {
-		return err
+		return ToAppError(err)
 	}
 
 	qtx := sqlcrepo.New(tx)
@@ -149,7 +149,7 @@ func (r *ContainerRepo) FillPorts(minPort, maxPort int) error {
 				return rerr
 			}
 
-			return err
+			return ToAppError(err)
 		}
 	}
 

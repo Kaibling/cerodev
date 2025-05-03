@@ -3,9 +3,9 @@ package auth
 import (
 	"net/http"
 
-	"github.com/kaibling/apiforge/apierror"
 	"github.com/kaibling/apiforge/envelope"
 	"github.com/kaibling/apiforge/route"
+	"github.com/kaibling/cerodev/api/apierrs"
 	"github.com/kaibling/cerodev/bootstrap"
 	"github.com/kaibling/cerodev/bootstrap/appctx"
 	"github.com/kaibling/cerodev/errs"
@@ -25,7 +25,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	var loginRequest model.LoginRequest
 	if err := route.ReadPostData(r, &loginRequest); err != nil {
 		l.Warn(errs.ErrMsg(msg.RequestParse, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -33,7 +33,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	us, err := bootstrap.NewUserService(r.Context())
 	if err != nil {
 		l.Warn(errs.ServiceBuildError(bootstrap.UserServiceName, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -41,7 +41,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	newToken, err := us.Login(&loginRequest)
 	if err != nil {
 		l.Warn(msg.RequestParse, err)
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -61,7 +61,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	token, err := appctx.GetToken(r.Context())
 	if err != nil {
 		l.Warn(errs.ErrMsg("cannot get token", err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -69,7 +69,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	ts, err := bootstrap.NewTokenService(r.Context())
 	if err != nil {
 		l.Warn(errs.ServiceBuildError(bootstrap.UserServiceName, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -77,7 +77,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	err = ts.Delete(token)
 	if err != nil {
 		l.Warn(errs.ErrMsg("cannot delete token", err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -98,7 +98,7 @@ func check(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		l.Warn(errs.ErrMsg("cannot get token", err))
 
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -106,7 +106,7 @@ func check(w http.ResponseWriter, r *http.Request) {
 	us, err := bootstrap.NewUserService(r.Context())
 	if err != nil {
 		l.Warn(errs.ServiceBuildError(bootstrap.UserServiceName, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -114,7 +114,7 @@ func check(w http.ResponseWriter, r *http.Request) {
 	user, err := us.CheckToken(token)
 	if err != nil {
 		l.Warn(errs.ErrMsg("cannot check token", err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}

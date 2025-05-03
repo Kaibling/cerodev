@@ -19,4 +19,8 @@ var (
 	ErrInvalidToken     = errors.New(msg.InvalidToken)
 
 	ErrContainerNotInProvider = errors.New(msg.ContainerNotInProvider)
+
+	ErrDataNotFound  = errors.New(msg.APIDataNotFound)
+	ErrDataTxError   = errors.New(msg.APIDataTxError)
+	ErrInternalError = errors.New(msg.APIInternalError)
 )

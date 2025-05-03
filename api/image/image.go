@@ -3,8 +3,8 @@ package images
 import (
 	"net/http"
 
-	"github.com/kaibling/apiforge/apierror"
 	"github.com/kaibling/apiforge/envelope"
+	"github.com/kaibling/cerodev/api/apierrs"
 	"github.com/kaibling/cerodev/bootstrap"
 	"github.com/kaibling/cerodev/errs"
 	"github.com/kaibling/cerodev/errs/msg"
@@ -22,7 +22,7 @@ func getImages(w http.ResponseWriter, r *http.Request) {
 	cs, err := bootstrap.NewContainerService(r.Context())
 	if err != nil {
 		l.Warn(errs.ServiceBuildError(bootstrap.ContainerServiceName, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -30,7 +30,7 @@ func getImages(w http.ResponseWriter, r *http.Request) {
 	images, err := cs.GetImages()
 	if err != nil {
 		l.Warn(errs.ErrMsg("cannot get images", err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}

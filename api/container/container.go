@@ -3,9 +3,9 @@ package container
 import (
 	"net/http"
 
-	"github.com/kaibling/apiforge/apierror"
 	"github.com/kaibling/apiforge/envelope"
 	"github.com/kaibling/apiforge/route"
+	"github.com/kaibling/cerodev/api/apierrs"
 	"github.com/kaibling/cerodev/bootstrap"
 	"github.com/kaibling/cerodev/errs"
 	"github.com/kaibling/cerodev/errs/msg"
@@ -24,7 +24,7 @@ func getContainers(w http.ResponseWriter, r *http.Request) {
 	cs, err := bootstrap.NewContainerService(r.Context())
 	if err != nil {
 		l.Warn(errs.ServiceBuildError(bootstrap.ContainerServiceName, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -32,7 +32,7 @@ func getContainers(w http.ResponseWriter, r *http.Request) {
 	containers, err := cs.GetAll()
 	if err != nil {
 		l.Warn(errs.ErrMsg("cannot get all containers", err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -52,7 +52,7 @@ func createContainer(w http.ResponseWriter, r *http.Request) {
 	var requestContainer model.Container
 	if err := route.ReadPostData(r, &requestContainer); err != nil {
 		l.Warn(errs.ErrMsg(msg.RequestParse, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -62,7 +62,7 @@ func createContainer(w http.ResponseWriter, r *http.Request) {
 	cs, err := bootstrap.NewContainerService(r.Context())
 	if err != nil {
 		l.Warn(errs.ServiceBuildError(bootstrap.ContainerServiceName, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -70,7 +70,7 @@ func createContainer(w http.ResponseWriter, r *http.Request) {
 	newContainer, err := cs.Create(&requestContainer)
 	if err != nil {
 		l.Warn(errs.ErrMsg("cannot create container", err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -92,7 +92,7 @@ func startContainer(w http.ResponseWriter, r *http.Request) { //nolint:dupl
 	cs, err := bootstrap.NewContainerService(r.Context())
 	if err != nil {
 		l.Warn(errs.ServiceBuildError(bootstrap.ContainerServiceName, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -100,7 +100,7 @@ func startContainer(w http.ResponseWriter, r *http.Request) { //nolint:dupl
 	err = cs.StartContainer(containerID)
 	if err != nil {
 		l.Warn(errs.ErrMsg("cannot start container", err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -122,7 +122,7 @@ func stopContainer(w http.ResponseWriter, r *http.Request) { //nolint:dupl
 	cs, err := bootstrap.NewContainerService(r.Context())
 	if err != nil {
 		l.Warn(errs.ServiceBuildError(bootstrap.ContainerServiceName, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -130,7 +130,7 @@ func stopContainer(w http.ResponseWriter, r *http.Request) { //nolint:dupl
 	err = cs.StopContainer(containerID)
 	if err != nil {
 		l.Warn(errs.ErrMsg("cannot stop container", err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -152,7 +152,7 @@ func deleteContainer(w http.ResponseWriter, r *http.Request) { //nolint:dupl
 	cs, err := bootstrap.NewContainerService(r.Context())
 	if err != nil {
 		l.Warn(errs.ServiceBuildError(bootstrap.ContainerServiceName, err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
@@ -160,7 +160,7 @@ func deleteContainer(w http.ResponseWriter, r *http.Request) { //nolint:dupl
 	err = cs.DeleteContainer(containerID)
 	if err != nil {
 		l.Warn(errs.ErrMsg("cannot delete container", err))
-		e.SetError(apierror.NewGeneric(err)).Finish(w, r, l)
+		e.SetError(apierrs.HandleError(err)).Finish(w, r, l)
 
 		return
 	}
