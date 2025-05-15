@@ -67,3 +67,9 @@ type LoginResponse struct {
 	UserID   string `json:"user_id"`
 	Token    string `json:"token"`
 }
+
+type WebSocketMessage struct {
+	Timestamp   string `json:"timestamp"`
+	MessageType string `json:"message_type"`
+	Message     string `json:"message"`
+}

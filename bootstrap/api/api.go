@@ -12,6 +12,7 @@ import (
 	apiservice "github.com/kaibling/apiforge/service"
 	"github.com/kaibling/apiforge/status"
 	"github.com/kaibling/cerodev/api"
+	"github.com/kaibling/cerodev/bootstrap"
 	"github.com/kaibling/cerodev/config"
 	"github.com/kaibling/cerodev/web"
 )
@@ -25,10 +26,17 @@ func Start(
 	conn *sql.DB,
 ) error {
 	root := chi.NewRouter()
+
+	wss, err := bootstrap.NewWebSocketService()
+	if err != nil {
+		return err
+	}
+	go wss.StartHealthCheck(ctx)
 	// context
 	root.Use(middleware.AddContext(ctxkeys.LoggerKey, baselogger))
 	root.Use(middleware.AddContext(ctxkeys.DBConnKey, conn))
 	root.Use(middleware.AddContext(ctxkeys.AppConfigKey, cfg))
+	root.Use(middleware.AddContext("websocket", wss))
 
 	// middleware
 	root.Use(cors.Handler(cors.Options{ //nolint:exhaustruct
